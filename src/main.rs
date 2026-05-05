@@ -1,6 +1,6 @@
 mod ovire;
 mod player;
-mod mapa;
+mod zemljevid;
 mod testi;
 
 use ovire::*;

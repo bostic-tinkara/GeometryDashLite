@@ -5,7 +5,7 @@ enum Ovire {
     Trikotnik,
 }
 
-pub struct Mapa {
+pub struct Zemljevid {
     stopnja: Stopnja,
     poligon: Vec<(f64, Ovire)>,
 }
@@ -14,9 +14,9 @@ enum Stopnja {
     Beginner,
 }
 
-impl Mapa {
+impl Zemljevid {
     fn new() -> Self {
-        Mapa {
+        Zemljevid {
             stopnja: Stopnja::Beginner,
             poligon: vec![]
         }
@@ -26,7 +26,7 @@ impl Mapa {
 
 
 // work in progress
-// struct OviraMapa {
+// struct OviraZemlj {
 //     pozicija: f64,
 //     lik: Ovire,
 // }
