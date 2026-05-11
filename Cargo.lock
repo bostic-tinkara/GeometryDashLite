@@ -3,6 +3,13 @@
 version = 4
 
 [[package]]
+name = "GeometryDash"
+version = "0.1.0"
+dependencies = [
+ "macroquad",
+]
+
+[[package]]
 name = "adler2"
 version = "2.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -222,13 +229,6 @@ dependencies = [
  "fdeflate",
  "flate2",
  "miniz_oxide",
-]
-
-[[package]]
-name = "projektna"
-version = "0.1.0"
-dependencies = [
- "macroquad",
 ]
 
 [[package]]

@@ -1,4 +1,5 @@
 use macroquad::prelude::*;
+use crate::player::*;
 
 pub enum Ovira {
 
@@ -14,6 +15,12 @@ pub enum Ovira {
         visina: f32,
         sirina: f32,
     },
+}
+
+pub enum IzidTrka {
+    None,
+    Smrt,
+    PristaniNaOviri(f32), // višina, na kateri smo pristali
 }
 
 impl Ovira {
@@ -57,15 +64,15 @@ impl Ovira {
         }
     }
 
-    pub fn draw(&self, color: Color) {
+    pub fn narisi(&self, x: f32, y: f32, color: Color) {
         match self {
             Ovira::Kvadrat { stranica } => {
                 let s = *stranica;
                 draw_rectangle(
                     // (x,y) je zgornje levo oglišče kvadrata
                     // ta bo postavljen na sredino ekrana
-                    screen_width() / 2.0 - s / 2.0,
-                    screen_height() / 2.0 - s / 2.0,
+                    x,
+                    y - s, //minus stranica, da stoji na tleh
                     s,
                     s,
                     color,
@@ -75,17 +82,52 @@ impl Ovira {
             Ovira::Trikotnik { visina, sirina } => {
                 let w = *sirina;
                 let h = *visina;
-                // postavljen na sredino ekrana
-                let x = screen_width() / 2.0;
-                let y = screen_height() / 2.0;
 
-                // izračun oglišč trikotnika
-                let v1 = vec2(x, y - h / 2.0);   // zgornje
-                let v2 = vec2(x - w / 2.0, y + h / 2.0); // levo
-                let v3 = vec2(x + w / 2.0, y + h / 2.0); // desno
+                // izračun oglišč trikotnika // UPORABLJAVA LEVO SPODNJE KRAJIŠČE ZA LAŽJI IZRAČUN POZICIJE
+                let v1 = vec2(x + w / 2.0, y - h );   // zgornje
+                let v2 = vec2(x , y ); // levo spodaj
+                let v3 = vec2(x + w , y ); // desno spodaj
 
                 draw_triangle(v1, v2, v3, color);
             }
         }
     }
+
+    pub fn preveri_trk(&self, o_x: f32, o_y:f32, p: &Player) -> IzidTrka {
+        let p_pravokotnik = Rect::new(p.x, p.y, p.stranica, p.stranica);
+
+        match self {
+            Ovira::Kvadrat { stranica } => {
+                let s = *stranica;
+                let o_pravokotnik = Rect::new(o_x, o_y - s, s, s);
+                if p_pravokotnik.overlaps(&o_pravokotnik) {
+                    // preverimo, ali smo pristali na kvadratu ali se zaleteli v stranico
+                    if p.y + p.stranica <= o_y + 5.0 { // pristali smo na kvadratu
+                        IzidTrka::PristaniNaOviri(o_y - s)
+                    } else { // zaleteli smo se v stranico
+                        IzidTrka::Smrt
+                    }
+                } else {
+                    IzidTrka::None
+                }
+            },
+
+            Ovira::Trikotnik { visina, sirina } => {
+                // Zaenkrat preprosto preverimo, ali se igralec dotika pravokotnika, ki obdaja trikotnik.
+                // To ni popolna detekcija trka s trikotnikom, ampak je dovolj za osnovno delovanje.
+                let o_pravokotnik = Rect::new(
+                    o_x - sirina / 2.0,
+                    o_y - visina / 2.0,
+                    *sirina,
+                    *visina,
+                );
+                if p_pravokotnik.overlaps(&o_pravokotnik) {
+                    IzidTrka::Smrt
+                } else {
+                    IzidTrka::None
+                }
+            }
+        }
+    }
+
 }
